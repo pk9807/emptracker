@@ -1,0 +1,30 @@
+name: employee_app
+description: Production-ready Employee Live Tracking, Attendance and Visit Field Force App.
+version: 1.0.0+1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  core:
+    path: ../../packages/core
+  models:
+    path: ../../packages/models
+  design_system:
+    path: ../../packages/design_system
+  services:
+    path: ../../packages/services
+  firebase_repository:
+    path: ../../packages/firebase_repository
+  location_engine:
+    path: ../../packages/location_engine
+  map_engine:
+    path: ../../packages/map_engine
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

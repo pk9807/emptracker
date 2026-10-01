@@ -1,0 +1,22 @@
+name: map_engine
+description: Google Maps 3D visualizer, custom animated canvas markers, and route playback engine.
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  core:
+    path: ../core
+  models:
+    path: ../models
+  design_system:
+    path: ../design_system
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

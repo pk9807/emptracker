@@ -1,0 +1,22 @@
+name: services
+description: Offline-first synchronization manager, image watermarking engine, and local storage caching.
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  core:
+    path: ../core
+  models:
+    path: ../models
+  shared_preferences: ^2.3.5
+  path_provider: ^2.1.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

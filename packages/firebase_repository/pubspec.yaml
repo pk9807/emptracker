@@ -1,0 +1,22 @@
+name: firebase_repository
+description: Clean Firestore, Firebase Auth, and Cloud Storage repository abstractions.
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  core:
+    path: ../core
+  models:
+    path: ../models
+  services:
+    path: ../services
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
