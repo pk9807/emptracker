@@ -6,8 +6,10 @@
 // @dart = 3.0
 
 import 'dart:io'; // flutter_ignore: dart_io_import.
+import 'package:google_maps_flutter_android/google_maps_flutter_android.dart' as google_maps_flutter_android;
 import 'package:path_provider_android/path_provider_android.dart' as path_provider_android;
 import 'package:shared_preferences_android/shared_preferences_android.dart' as shared_preferences_android;
+import 'package:google_maps_flutter_ios/google_maps_flutter_ios.dart' as google_maps_flutter_ios;
 import 'package:path_provider_foundation/path_provider_foundation.dart' as path_provider_foundation;
 import 'package:shared_preferences_foundation/shared_preferences_foundation.dart' as shared_preferences_foundation;
 import 'package:path_provider_linux/path_provider_linux.dart' as path_provider_linux;
@@ -23,6 +25,15 @@ class _PluginRegistrant {
   @pragma('vm:entry-point')
   static void register() {
     if (Platform.isAndroid) {
+      try {
+        google_maps_flutter_android.GoogleMapsFlutterAndroid.registerWith();
+      } catch (err) {
+        print(
+          '`google_maps_flutter_android` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
       try {
         path_provider_android.PathProviderAndroid.registerWith();
       } catch (err) {
@@ -42,6 +53,15 @@ class _PluginRegistrant {
       }
 
     } else if (Platform.isIOS) {
+      try {
+        google_maps_flutter_ios.GoogleMapsFlutterIOS.registerWith();
+      } catch (err) {
+        print(
+          '`google_maps_flutter_ios` threw an error: $err. '
+          'The app may not function as expected until you remove this plugin from pubspec.yaml'
+        );
+      }
+
       try {
         path_provider_foundation.PathProviderFoundation.registerWith();
       } catch (err) {

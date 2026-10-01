@@ -95,29 +95,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Center(
-                    child: Container(
-                      width: 76,
-                      height: 76,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: AppColors.primaryGradient,
-                        ),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.35),
-                            blurRadius: 24,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.admin_panel_settings_rounded,
-                        size: 40,
-                        color: Colors.white,
-                      ),
-                    ),
+                  const Center(
+                    child: AppLogoBadge(size: 88),
                   ),
                   const SizedBox(height: 20),
                   Text(

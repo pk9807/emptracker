@@ -22,6 +22,12 @@ dependencies:
     path: ../../packages/firebase_repository
   map_engine:
     path: ../../packages/map_engine
+  google_maps_flutter: ^2.10.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
 
 dev_dependencies:
   flutter_test:

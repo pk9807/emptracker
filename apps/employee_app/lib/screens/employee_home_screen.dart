@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:firebase_repository/firebase_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location_engine/location_engine.dart';
 import 'package:map_engine/map_engine.dart';
 import 'package:models/models.dart';
@@ -300,6 +301,49 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 24),
+
+              // Live Google Maps Area Preview
+              Text(
+                'LIVE ROUTE & GEOFENCE RADAR',
+                style: AppTypography.badge(
+                  color: isDark
+                      ? AppColors.textTertiaryDark
+                      : AppColors.textTertiaryLight,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                child: SizedBox(
+                  height: 190,
+                  child: GoogleMapsLiveView(
+                    markers: [
+                      MapMarkerItem(
+                        id: widget.employee.id,
+                        title: widget.employee.name,
+                        latitude: _currentLocation?.latitude ?? 28.6328,
+                        longitude: _currentLocation?.longitude ?? 77.2197,
+                        type: MarkerType.employee,
+                        liveStatus: _isDutyActive
+                            ? TrackingLiveStatus.live
+                            : TrackingLiveStatus.offline,
+                        battery: _currentLocation?.battery ?? 88,
+                      ),
+                      const MapMarkerItem(
+                        id: 'shp_01',
+                        title: 'Shree Ganesh Supermart',
+                        latitude: 28.6328,
+                        longitude: 77.2197,
+                        type: MarkerType.shop,
+                      ),
+                    ],
+                    initialCenter: const LatLng(28.6328, 77.2197),
+                    initialZoom: 15.0,
+                    showGeofenceCircles: true,
+                  ),
+                ),
               ),
               const SizedBox(height: 24),
 

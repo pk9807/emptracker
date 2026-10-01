@@ -16,6 +16,7 @@ dependencies:
     path: ../models
   design_system:
     path: ../design_system
+  google_maps_flutter: ^2.10.0
 
 dev_dependencies:
   flutter_test:

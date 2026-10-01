@@ -88,8 +88,8 @@ class _LiveTrackingMapScreenState extends State<LiveTrackingMapScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Full Screen 3D Map View
-          InteractiveMapView(
+          // Full Screen Google Maps Live View
+          GoogleMapsLiveView(
             markers: markers,
             selectedMarker: _selectedLocation != null
                 ? markers.firstWhere(

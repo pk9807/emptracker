@@ -106,31 +106,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // App Brand Logo & 3D Badge
-                  Center(
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: AppColors.primaryGradient,
-                        ),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.35),
-                            blurRadius: 24,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.radar_rounded,
-                        size: 42,
-                        color: Colors.white,
-                      ),
-                    ),
+                  const Center(
+                    child: AppLogoBadge(size: 88),
                   ),
                   const SizedBox(height: 24),
                   Text(
