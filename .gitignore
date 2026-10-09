@@ -47,3 +47,5 @@ backend/vendor/
 .idea/
 *.iml
 .vscode/
+bin/
+
