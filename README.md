@@ -9,13 +9,39 @@
 
 ---
 
-## 🎬 Live Platform Demo Walkthrough
+## 🎬 Live Platform Demo Walkthrough & Feature Guide
 
 <div align="center">
-  <img src="docs/assets/emptracker_demo.gif" alt="EmpTracker FieldForce AI Demo Walkthrough" width="380" style="border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid #6366f1;" />
-  <p><em>Live Telemetry, 3D GPS Map Tracking, Geofenced Shop Visits & Multilingual Voice AI Assistant</em></p>
-  <p><a href="docs/assets/emptracker_demo.mp4">▶️ <b>Watch Full HD Demo MP4 Video (60 FPS)</b></a></p>
+  <img src="docs/assets/fieldforce_platform_walkthrough.gif" alt="FieldForce EmpTracker AI Platform Walkthrough" width="420" style="border-radius: 20px; box-shadow: 0 12px 36px rgba(0,0,0,0.35); border: 2px solid #6366f1;" />
+  <p><em>End-to-End Field Operations: Admin Command Center, 3D GPS Telemetry, Geofenced Visits & Multilingual AI Voice Assistant</em></p>
+  <p><a href="docs/assets/fieldforce_platform_walkthrough.mp4">▶️ <b>Watch High-Definition Walkthrough MP4 Video (1080p Mobile Full HD)</b></a></p>
 </div>
+
+---
+
+## 🔑 Demo Access Credentials
+
+| Portal / App | Role | Demo Email | Password | Primary Capabilities |
+|---|---|---|---|---|
+| **Admin Command Center** | Operations Admin | `admin@fieldforce.com` | `Admin@123456` | 3D Live Telemetry Radar, Employee Management, Geofence Config, AI Operations Copilot |
+| **Field Operations App** | Field Representative | `rahul@fieldforce.com` | `Emp@123456` | Shift Duty Toggle, Live GPS Sync, Geofenced Shop Check-in, Order Logging, AI Voice Assistant |
+
+---
+
+## 📋 Walkthrough Feature Breakdown
+
+| Step | Portal | Feature Demonstrated | Details |
+|---|---|---|---|
+| **01** | **Admin App** | **Master Admin Login** | Multi-tenant RBAC login, ISO 27001 security, and offline mode fallback. |
+| **02** | **Admin App** | **Live 3D GPS Telemetry** | Real-time map tracking of all field reps, speed, battery %, and breadcrumb trails. |
+| **03** | **Admin App** | **AI Operations Copilot** | Multilingual voice queries in Hindi/English with real-time operational summaries. |
+| **04** | **Admin App** | **Geofenced Retail Stores** | Store management, radius configuration (50m–200m), and visit compliance logs. |
+| **05** | **Employee App** | **Mobile Rep Login** | Fast field executive authentication and daily territory sync. |
+| **06** | **Employee App** | **Shift Off-Duty State** | Displays assigned stores (5 Shops), GPS readiness, and total distance tracked. |
+| **07** | **Employee App** | **Start Duty & GPS Radar** | Background tracking activation with ±4.8m precision and live location pinging. |
+| **08** | **Employee App** | **Assigned Shops & Radar** | Dynamic proximity calculations showing stores in geofence range (*0m away*). |
+| **09** | **Employee App** | **Geofenced Shop Check-in** | Strict radial geofence validation, photo proof capture, order value & notes log. |
+| **10** | **Employee App** | **Hands-Free Voice Copilot** | Speech-to-Text field voice input for rapid store reporting and task logging. |
 
 ---
 
