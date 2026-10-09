@@ -6,3 +6,4 @@ export 'errors/app_exceptions.dart';
 export 'utils/haversine_calculator.dart';
 export 'utils/date_time_utils.dart';
 export 'utils/anomaly_detector.dart';
+export 'network/api_client.dart';

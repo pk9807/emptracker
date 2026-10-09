@@ -24,13 +24,21 @@ class AssignedShopsScreen extends StatefulWidget {
 class _AssignedShopsScreenState extends State<AssignedShopsScreen> {
   List<ShopModel> _shops = [];
   bool _isLoading = true;
-  final double _userLat = 28.6328;
-  final double _userLon = 77.2197;
+  String _searchQuery = '';
+  final TextEditingController _searchCtrl = TextEditingController();
+  final double _userLat = 26.490745;
+  final double _userLon = 80.318524;
 
   @override
   void initState() {
     super.initState();
     _loadShops();
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
   }
 
   Future<void> _loadShops() async {
@@ -43,29 +51,80 @@ class _AssignedShopsScreenState extends State<AssignedShopsScreen> {
     }
   }
 
+  List<ShopModel> get _filteredShops {
+    if (_searchQuery.trim().isEmpty) return _shops;
+    final q = _searchQuery.toLowerCase();
+    return _shops.where((s) {
+      return s.name.toLowerCase().contains(q) ||
+          s.address.toLowerCase().contains(q) ||
+          s.code.toLowerCase().contains(q);
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final displayShops = _filteredShops;
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Assigned Shops',
             style: AppTypography.headingLarge(isDark: isDark)),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+            child: Container(
+              height: 44,
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.surfaceDark : const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: TextField(
+                controller: _searchCtrl,
+                decoration: InputDecoration(
+                  hintText: 'Search shops, Kanpur, or locality...',
+                  hintStyle: TextStyle(
+                    fontSize: 13,
+                    color: isDark ? AppColors.textTertiaryDark : AppColors.textTertiaryLight,
+                  ),
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, size: 18),
+                          onPressed: () {
+                            _searchCtrl.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        )
+                      : null,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                onChanged: (val) {
+                  setState(() => _searchQuery = val);
+                },
+              ),
+            ),
+          ),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _shops.isEmpty
-              ? const EmptyStateView(
+          : displayShops.isEmpty
+              ? EmptyStateView(
                   icon: Icons.storefront,
-                  title: 'No Assigned Shops',
-                  description: 'You have no assigned shops scheduled for today.',
+                  title: _searchQuery.isNotEmpty ? 'No Matching Shops' : 'No Assigned Shops',
+                  description: _searchQuery.isNotEmpty
+                      ? 'No shops matching "$_searchQuery".'
+                      : 'You have no assigned shops scheduled for today.',
                 )
               : ListView.separated(
                   padding: AppSpacing.paddingPage,
-                  itemCount: _shops.length,
+                  itemCount: displayShops.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
-                    final shop = _shops[index];
+                    final shop = displayShops[index];
                     final distanceMeters = HaversineCalculator.distanceMeters(
                       lat1: _userLat,
                       lon1: _userLon,

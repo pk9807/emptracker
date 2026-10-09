@@ -42,6 +42,46 @@ class EmployeeModel extends Equatable {
 
   bool get isWorking => trackingStatus == DutyStatus.active;
 
+  EmployeeModel copyWith({
+    String? id,
+    String? userId,
+    String? organizationId,
+    String? name,
+    String? employeeCode,
+    String? phone,
+    String? email,
+    String? photoUrl,
+    String? designation,
+    String? department,
+    bool? active,
+    DutyStatus? trackingStatus,
+    Map<String, dynamic>? lastLocation,
+    DateTime? lastLocationAt,
+    String? deviceId,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return EmployeeModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      organizationId: organizationId ?? this.organizationId,
+      name: name ?? this.name,
+      employeeCode: employeeCode ?? this.employeeCode,
+      phone: phone ?? this.phone,
+      email: email ?? this.email,
+      photoUrl: photoUrl ?? this.photoUrl,
+      designation: designation ?? this.designation,
+      department: department ?? this.department,
+      active: active ?? this.active,
+      trackingStatus: trackingStatus ?? this.trackingStatus,
+      lastLocation: lastLocation ?? this.lastLocation,
+      lastLocationAt: lastLocationAt ?? this.lastLocationAt,
+      deviceId: deviceId ?? this.deviceId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -66,30 +106,45 @@ class EmployeeModel extends Equatable {
 
   factory EmployeeModel.fromMap(Map<String, dynamic> map,
       {String? documentId}) {
+    final rawId = documentId ?? map['id']?.toString() ?? '';
+    final rawUserId = (map['userId'] ?? map['user_id'] ?? map['id'])?.toString() ?? '';
+    final rawOrgId = (map['organizationId'] ?? map['organization_id'])?.toString() ?? 'org_1';
+    final rawCode = (map['employeeCode'] ?? map['employee_code'])?.toString() ?? '';
+    final rawName = (map['name'])?.toString() ?? '';
+    final rawPhone = (map['phone'])?.toString() ?? '';
+    final rawEmail = (map['email'])?.toString() ?? '';
+    final rawPhoto = (map['photoUrl'] ?? map['avatar']) as String?;
+    final rawDesig = (map['designation'])?.toString() ?? 'Field Officer';
+    final rawDept = (map['department'])?.toString() ?? 'Operations';
+    final rawActive = map['active'] as bool? ?? map['is_active'] as bool? ?? true;
+    final isOnDuty = map['is_on_duty'] == true || map['trackingStatus'] == 'ACTIVE' || map['status'] == 'ON_DUTY';
+
     return EmployeeModel(
-      id: documentId ?? map['id'] as String? ?? '',
-      userId: map['userId'] as String? ?? '',
-      organizationId: map['organizationId'] as String? ?? '',
-      name: map['name'] as String? ?? '',
-      employeeCode: map['employeeCode'] as String? ?? '',
-      phone: map['phone'] as String? ?? '',
-      email: map['email'] as String? ?? '',
-      photoUrl: map['photoUrl'] as String?,
-      designation: map['designation'] as String? ?? '',
-      department: map['department'] as String? ?? '',
-      active: map['active'] as bool? ?? true,
-      trackingStatus: DutyStatus.fromString(map['trackingStatus'] as String?),
-      lastLocation: map['lastLocation'] as Map<String, dynamic>?,
+      id: rawId,
+      userId: rawUserId,
+      organizationId: rawOrgId,
+      name: rawName,
+      employeeCode: rawCode,
+      phone: rawPhone,
+      email: rawEmail,
+      photoUrl: rawPhoto,
+      designation: rawDesig,
+      department: rawDept,
+      active: rawActive,
+      trackingStatus: isOnDuty ? DutyStatus.active : DutyStatus.inactive,
+      lastLocation: map['lastLocation'] as Map<String, dynamic>? ?? map['live_location'] as Map<String, dynamic>?,
       lastLocationAt: map['lastLocationAt'] != null
           ? DateTime.tryParse(map['lastLocationAt'].toString())
-          : null,
-      deviceId: map['deviceId'] as String?,
+          : (map['live_location'] != null && map['live_location']['last_ping_at'] != null)
+              ? DateTime.tryParse(map['live_location']['last_ping_at'].toString())
+              : null,
+      deviceId: map['deviceId']?.toString(),
       createdAt: map['createdAt'] != null
           ? DateTime.tryParse(map['createdAt'].toString()) ?? DateTime.now()
-          : DateTime.now(),
+          : (map['created_at'] != null ? DateTime.tryParse(map['created_at'].toString()) ?? DateTime.now() : DateTime.now()),
       updatedAt: map['updatedAt'] != null
           ? DateTime.tryParse(map['updatedAt'].toString()) ?? DateTime.now()
-          : DateTime.now(),
+          : (map['updated_at'] != null ? DateTime.tryParse(map['updated_at'].toString()) ?? DateTime.now() : DateTime.now()),
     );
   }
 

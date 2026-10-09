@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FieldForce Pro — APK Download Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>FieldForce Pro — Dynamic Laravel & Real-Time Tracking Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #2563EB;
@@ -35,20 +35,20 @@
             justify-content: center;
             padding: 24px;
             background-image: 
-                radial-gradient(circle at 20% 15%, rgba(37, 99, 235, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 80% 85%, rgba(16, 185, 129, 0.12) 0%, transparent 40%);
+                radial-gradient(circle at 20% 15%, rgba(37, 99, 235, 0.18) 0%, transparent 40%),
+                radial-gradient(circle at 80% 85%, rgba(16, 185, 129, 0.15) 0%, transparent 40%);
         }
 
         .container {
-            max-width: 880px;
+            max-width: 900px;
             width: 100%;
             text-align: center;
         }
 
         .app-logo {
-            width: 96px;
-            height: 96px;
-            border-radius: 26px;
+            width: 100px;
+            height: 100px;
+            border-radius: 28px;
             box-shadow: 0 14px 35px rgba(37, 99, 235, 0.45);
             margin-bottom: 20px;
             border: 2px solid rgba(56, 189, 248, 0.3);
@@ -69,108 +69,120 @@
             margin-bottom: 20px;
         }
 
-        .pulse-dot {
+        .pulse {
             width: 8px;
             height: 8px;
             background-color: var(--live-green);
             border-radius: 50%;
-            box-shadow: 0 0 10px var(--live-green);
-            animation: pulse 1.8s infinite;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse-animation 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        @keyframes pulse-animation {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
         h1 {
             font-family: 'Outfit', sans-serif;
             font-size: 38px;
-            font-weight: 700;
-            letter-spacing: -0.8px;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 100%);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #FFFFFF 30%, #93C5FD 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         p.subtitle {
-            color: var(--text-secondary);
             font-size: 16px;
-            max-width: 600px;
-            margin: 0 auto 36px auto;
+            color: var(--text-secondary);
+            margin-bottom: 36px;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
             line-height: 1.5;
         }
 
-        .grid {
+        .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 24px;
-            margin-bottom: 32px;
-            text-align: left;
+            margin-bottom: 40px;
         }
 
         .card {
             background: var(--card-dark);
             border: 1px solid var(--border-dark);
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 28px;
+            text-align: left;
             position: relative;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-            transition: transform 0.2s ease, border-color 0.2s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.25s ease, border-color 0.25s ease;
         }
 
         .card:hover {
             transform: translateY(-4px);
-            border-color: var(--primary);
+            border-color: rgba(37, 99, 235, 0.6);
         }
 
         .card-header {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
             margin-bottom: 16px;
         }
 
-        .icon-box {
+        .card-icon {
             width: 48px;
             height: 48px;
-            border-radius: 12px;
+            border-radius: 14px;
+            background: rgba(37, 99, 235, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #60A5FA;
             font-size: 24px;
-        }
-
-        .icon-employee {
-            background: rgba(37, 99, 235, 0.15);
-            color: #38BDF8;
-            border: 1px solid rgba(56, 189, 248, 0.3);
-        }
-
-        .icon-admin {
-            background: rgba(139, 92, 246, 0.15);
-            color: #A78BFA;
-            border: 1px solid rgba(167, 139, 250, 0.3);
+            border: 1px solid rgba(37, 99, 235, 0.3);
         }
 
         .card-title {
             font-family: 'Outfit', sans-serif;
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .card-version {
-            font-size: 13px;
-            color: var(--text-secondary);
+            font-size: 22px;
+            font-weight: 700;
+            color: #FFFFFF;
         }
 
         .card-desc {
-            color: var(--text-secondary);
             font-size: 14px;
+            color: var(--text-secondary);
             line-height: 1.5;
             margin-bottom: 20px;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        .features-list li {
+            font-size: 13px;
+            color: #CBD5E1;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .features-list li::before {
+            content: "✓";
+            color: var(--live-green);
+            font-weight: bold;
         }
 
         .btn-download {
@@ -178,120 +190,167 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, #1D4ED8 100%);
+            color: #FFFFFF;
+            text-decoration: none;
             padding: 14px 20px;
-            border-radius: 12px;
+            border-radius: 14px;
             font-weight: 600;
             font-size: 15px;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 14px var(--primary-glow);
+            box-shadow: 0 8px 20px var(--primary-glow);
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
 
-        .btn-employee {
-            background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
-            color: #FFFFFF;
-        }
-
-        .btn-employee:hover {
+        .btn-download:hover {
             opacity: 0.95;
-            box-shadow: 0 6px 20px var(--primary-glow);
+            transform: scale(1.02);
         }
 
         .btn-admin {
-            background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
-            color: #FFFFFF;
-            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+            background: linear-gradient(135deg, #4F46E5 0%, #3730A3 100%);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
         }
 
-        .btn-admin:hover {
-            opacity: 0.95;
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+        .credentials-box {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border-dark);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 30px;
         }
 
-        .meta-info {
+        .credentials-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #93C5FD;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+        }
+
+        .cred-row {
             display: flex;
             justify-content: space-between;
-            margin-top: 14px;
-            font-size: 12px;
+            font-size: 13px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .cred-row:last-child {
+            border-bottom: none;
+        }
+
+        .cred-label {
             color: var(--text-secondary);
         }
 
-        .instructions {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px dashed var(--border-dark);
-            border-radius: 14px;
-            padding: 18px 24px;
+        .cred-val {
+            color: #F8FAFC;
+            font-family: monospace;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .footer {
             font-size: 13px;
             color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .instructions strong {
-            color: var(--text-primary);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <img src="logo.png" alt="FieldForce Pro Logo" class="app-logo">
-        
-        <div>
-            <div class="badge">
-                <div class="pulse-dot"></div>
-                GOOGLE MAPS & 3D LOGO EMBEDDED
+        <br>
+        <div class="badge">
+            <span class="pulse"></span>
+            Laravel 11 Backend & Live GPS Radar Active
+        </div>
+
+        <h1>FieldForce Pro — Enterprise Mobile System</h1>
+        <p class="subtitle">
+            Complete real-time Ola/Uber/Swiggy-style field employee live tracking, duty punch attendance, shop geofencing, and visit verification powered by dynamic Laravel REST API.
+        </p>
+
+        <div class="cards-grid">
+            <!-- Employee Mobile App -->
+            <div class="card">
+                <div>
+                    <div class="card-header">
+                        <div class="card-icon">📱</div>
+                        <div>
+                            <div class="card-title">Employee Mobile App</div>
+                            <span style="font-size: 12px; color: #60A5FA;">fieldforce-employee.apk</span>
+                        </div>
+                    </div>
+                    <div class="card-desc">
+                        Dedicated field agent mobile application for background GPS streaming, duty attendance punch, shop visit check-ins, and proof capture.
+                    </div>
+                    <ul class="features-list">
+                        <li>Live GPS pinging (Ola/Uber stream)</li>
+                        <li>Duty Punch-In / Punch-Out with photo</li>
+                        <li>Geofenced shop visits & photo proof</li>
+                        <li>Offline sync & battery optimization</li>
+                    </ul>
+                </div>
+                <a href="employee-app.apk" class="btn-download" download>
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Download Employee APK (52 MB)
+                </a>
+            </div>
+
+            <!-- Admin Command Dashboard -->
+            <div class="card">
+                <div>
+                    <div class="card-header">
+                        <div class="card-icon" style="background: rgba(79, 70, 229, 0.15); border-color: rgba(79, 70, 229, 0.3); color: #818CF8;">🛰️</div>
+                        <div>
+                            <div class="card-title">Admin Command App</div>
+                            <span style="font-size: 12px; color: #818CF8;">fieldforce-admin.apk</span>
+                        </div>
+                    </div>
+                    <div class="card-desc">
+                        Live monitoring radar displaying all field agents moving in real-time, employee registration, shop geofences, and attendance analytics.
+                    </div>
+                    <ul class="features-list">
+                        <li>Real-time Live Radar Map (3s updates)</li>
+                        <li>Employee Registration & Management</li>
+                        <li>Shop Management & Geofence Radius</li>
+                        <li>Attendance Timesheets & Route Replay</li>
+                    </ul>
+                </div>
+                <a href="admin-app.apk" class="btn-download btn-admin" download>
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Download Admin APK (53 MB)
+                </a>
             </div>
         </div>
 
-        <h1>FieldForce Pro Android Releases</h1>
-        <p class="subtitle">Download production-ready release APKs with 3D Launcher Icons & Google Maps integration directly over the local WiFi network.</p>
-
-        <div class="grid">
-            <!-- Employee App Card -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon-box icon-employee">📱</div>
-                    <div>
-                        <div class="card-title">Employee Field App</div>
-                        <div class="card-version">v1.0.0+1 (Release APK)</div>
-                    </div>
-                </div>
-                <div class="card-desc">
-                    Live GPS tracking, Google Maps live preview radar, geofenced shop visits, watermarked camera proof, and offline sync.
-                </div>
-                <a href="employee-app-release.apk" class="btn-download btn-employee" download>
-                    ⬇️ Download Employee APK (51 MB)
-                </a>
-                <div class="meta-info">
-                    <span>Google Maps Enabled</span>
-                    <span>3D App Icon</span>
-                </div>
+        <!-- Credentials Reference Box -->
+        <div class="credentials-box">
+            <div class="credentials-title">🔑 Live System Credentials (Laravel 11 Backend)</div>
+            <div class="cred-row">
+                <span class="cred-label">Admin Login (Admin App):</span>
+                <span class="cred-val">admin@fieldforce.com / Admin@123456</span>
             </div>
-
-            <!-- Admin App Card -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="icon-box icon-admin">📊</div>
-                    <div>
-                        <div class="card-title">Admin Command App</div>
-                        <div class="card-version">v1.0.0+1 (Release APK)</div>
-                    </div>
-                </div>
-                <div class="card-desc">
-                    Full-Screen Google Maps live tracking with 3D tilt, satellite toggle, geofence radius circles, visit audits, and export.
-                </div>
-                <a href="admin-app-release.apk" class="btn-download btn-admin" download>
-                    ⬇️ Download Admin APK (53 MB)
-                </a>
-                <div class="meta-info">
-                    <span>Google Maps 3D View</span>
-                    <span>3D App Icon</span>
-                </div>
+            <div class="cred-row">
+                <span class="cred-label">Employee Login (Mobile App):</span>
+                <span class="cred-val">rahul@fieldforce.com / Emp@123456</span>
+            </div>
+            <div class="cred-row">
+                <span class="cred-label">Other Field Executives:</span>
+                <span class="cred-val">priya@fieldforce.com / Emp@123456</span>
+            </div>
+            <div class="cred-row">
+                <span class="cred-label">Backend API Base URL:</span>
+                <span class="cred-val">http://192.168.0.106/emptracker/backend/public/index.php/api</span>
             </div>
         </div>
 
-        <div class="instructions">
-            💡 <strong>Installation Note:</strong> When installing on your Android phone, tap <em>"Install anyway"</em> or allow <em>"Install unknown apps"</em> from your mobile browser settings.
+        <div class="footer">
+            Developed with Flutter & Laravel 11 • Local Network IP: <code>192.168.0.106</code>
         </div>
     </div>
 </body>

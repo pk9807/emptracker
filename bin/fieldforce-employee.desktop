@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=FieldForce Pro — Employee Field Portal
+Comment=Live Duty GPS Tracking, Geofenced Shop Visits & Timesheet Management
+Exec=/var/www/html/emptracker/bin/fieldforce-employee.sh
+Icon=/home/pradeep/.local/share/icons/fieldforce-employee.png
+Terminal=false
+Categories=Office;Development;Utility;
+StartupWMClass=fieldforce-employee
+Keywords=employee;duty;tracking;fieldforce;visit;

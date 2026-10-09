@@ -1,4 +1,3 @@
-import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:firebase_repository/firebase_repository.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +80,7 @@ class _ReportsExportScreenState extends State<ReportsExportScreen> {
                   ),
                   const SizedBox(height: 14),
                   DropdownButtonFormField<String>(
-                    value: _selectedReportType,
+                    initialValue: _selectedReportType,
                     decoration: InputDecoration(
                       labelText: 'Report Type',
                       filled: true,

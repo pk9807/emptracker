@@ -2,6 +2,10 @@ class AppConstants {
   static const String appName = 'FieldForce Pro';
   static const String appVersion = '1.0.0+1';
 
+  // Laravel Backend API Base URL
+  static const String backendHost = '192.168.0.108';
+  static const String apiBaseUrl = 'http://192.168.0.108/emptracker/backend/public/index.php/api';
+
   // Geofence defaults in meters
   static const double defaultGeofenceRadiusMeters = 100.0;
   static const double strictGeofenceRadiusMeters = 50.0;

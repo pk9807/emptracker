@@ -10,3 +10,5 @@ export 'assignment_model.dart';
 export 'attendance_model.dart';
 export 'visit_model.dart';
 export 'device_model.dart';
+export 'ai_message_model.dart';
+

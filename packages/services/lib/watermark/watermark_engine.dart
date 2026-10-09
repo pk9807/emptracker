@@ -123,7 +123,7 @@ class WatermarkEngine {
     );
     final textPainter = TextPainter(
       text: textSpan,
-      textDirection: TextDirection.ltr,
+      textDirection: ui.TextDirection.ltr,
     )..layout();
     textPainter.paint(canvas, offset);
   }

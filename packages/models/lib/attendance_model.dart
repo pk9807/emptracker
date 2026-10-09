@@ -82,28 +82,40 @@ class AttendanceModel extends Equatable {
 
   factory AttendanceModel.fromMap(Map<String, dynamic> map,
       {String? documentId}) {
+    final startLoc = map['startLocation'] != null
+        ? AttendanceLocation.fromMap(map['startLocation'] as Map<String, dynamic>?)
+        : AttendanceLocation(
+            latitude: (map['check_in_lat'] as num?)?.toDouble() ?? 0.0,
+            longitude: (map['check_in_lng'] as num?)?.toDouble() ?? 0.0,
+            address: map['check_in_address'] as String?,
+          );
+
+    final endLoc = map['endLocation'] != null
+        ? AttendanceLocation.fromMap(map['endLocation'] as Map<String, dynamic>?)
+        : (map['check_out_lat'] != null
+            ? AttendanceLocation(
+                latitude: (map['check_out_lat'] as num?)?.toDouble() ?? 0.0,
+                longitude: (map['check_out_lng'] as num?)?.toDouble() ?? 0.0,
+                address: map['check_out_address'] as String?,
+              )
+            : null);
+
     return AttendanceModel(
-      id: documentId ?? map['id'] as String? ?? '',
-      organizationId: map['organizationId'] as String? ?? '',
-      employeeId: map['employeeId'] as String? ?? '',
-      dateKey: map['dateKey'] as String? ?? '',
+      id: documentId ?? map['id']?.toString() ?? '',
+      organizationId: (map['organizationId'] ?? map['organization_id'])?.toString() ?? 'org_1',
+      employeeId: (map['employeeId'] ?? map['user_id'])?.toString() ?? '',
+      dateKey: (map['dateKey'] ?? map['date'])?.toString() ?? '',
       startTime: map['startTime'] != null
           ? DateTime.tryParse(map['startTime'].toString()) ?? DateTime.now()
-          : DateTime.now(),
-      startLocation: AttendanceLocation.fromMap(
-          map['startLocation'] as Map<String, dynamic>?),
+          : (map['check_in_time'] != null ? DateTime.tryParse(map['check_in_time'].toString()) ?? DateTime.now() : DateTime.now()),
+      startLocation: startLoc,
       endTime: map['endTime'] != null
           ? DateTime.tryParse(map['endTime'].toString())
-          : null,
-      endLocation: map['endLocation'] != null
-          ? AttendanceLocation.fromMap(
-              map['endLocation'] as Map<String, dynamic>?)
-          : null,
-      workingDurationMinutes:
-          (map['workingDurationMinutes'] as num?)?.toInt() ?? 0,
+          : (map['check_out_time'] != null ? DateTime.tryParse(map['check_out_time'].toString()) : null),
+      endLocation: endLoc,
+      workingDurationMinutes: (map['workingDurationMinutes'] as num?)?.toInt() ?? 0,
       totalVisitsCount: (map['totalVisitsCount'] as num?)?.toInt() ?? 0,
-      totalDistanceKm:
-          (map['totalDistanceKm'] as num?)?.toDouble() ?? 0.0,
+      totalDistanceKm: ((map['totalDistanceKm'] ?? map['total_distance_km']) as num?)?.toDouble() ?? 0.0,
       status: map['status'] as String? ?? 'WORKING',
     );
   }

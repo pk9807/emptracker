@@ -33,6 +33,38 @@ class ShopModel extends Equatable {
 
   bool get isActive => status == 'ACTIVE';
 
+  ShopModel copyWith({
+    String? id,
+    String? organizationId,
+    String? name,
+    String? code,
+    String? address,
+    double? latitude,
+    double? longitude,
+    double? radius,
+    String? contactPerson,
+    String? phone,
+    String? status,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return ShopModel(
+      id: id ?? this.id,
+      organizationId: organizationId ?? this.organizationId,
+      name: name ?? this.name,
+      code: code ?? this.code,
+      address: address ?? this.address,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      radius: radius ?? this.radius,
+      contactPerson: contactPerson ?? this.contactPerson,
+      phone: phone ?? this.phone,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -53,23 +85,23 @@ class ShopModel extends Equatable {
 
   factory ShopModel.fromMap(Map<String, dynamic> map, {String? documentId}) {
     return ShopModel(
-      id: documentId ?? map['id'] as String? ?? '',
-      organizationId: map['organizationId'] as String? ?? '',
-      name: map['name'] as String? ?? '',
-      code: map['code'] as String? ?? '',
-      address: map['address'] as String? ?? '',
+      id: documentId ?? map['id']?.toString() ?? '',
+      organizationId: (map['organizationId'] ?? map['organization_id'])?.toString() ?? 'org_1',
+      name: (map['name'])?.toString() ?? '',
+      code: (map['code'] ?? map['qr_code'] ?? map['id'])?.toString() ?? '',
+      address: (map['address'])?.toString() ?? '',
       latitude: (map['latitude'] as num?)?.toDouble() ?? 0.0,
       longitude: (map['longitude'] as num?)?.toDouble() ?? 0.0,
-      radius: (map['radius'] as num?)?.toDouble() ?? 100.0,
-      contactPerson: map['contactPerson'] as String?,
-      phone: map['phone'] as String?,
-      status: map['status'] as String? ?? 'ACTIVE',
+      radius: (map['radius'] ?? map['geofence_radius_meters'] as num?)?.toDouble() ?? 100.0,
+      contactPerson: (map['contactPerson'] ?? map['owner_name']) as String?,
+      phone: (map['phone'])?.toString(),
+      status: (map['status'])?.toString() ?? 'ACTIVE',
       createdAt: map['createdAt'] != null
           ? DateTime.tryParse(map['createdAt'].toString()) ?? DateTime.now()
-          : DateTime.now(),
+          : (map['created_at'] != null ? DateTime.tryParse(map['created_at'].toString()) ?? DateTime.now() : DateTime.now()),
       updatedAt: map['updatedAt'] != null
           ? DateTime.tryParse(map['updatedAt'].toString()) ?? DateTime.now()
-          : DateTime.now(),
+          : (map['updated_at'] != null ? DateTime.tryParse(map['updated_at'].toString()) ?? DateTime.now() : DateTime.now()),
     );
   }
 

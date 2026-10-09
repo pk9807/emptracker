@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=FieldForce Pro — Admin Command Center
+Comment=Real-Time Field Fleet Radar, Geofence Management & Timesheet Analytics
+Exec=/var/www/html/emptracker/bin/fieldforce-admin.sh
+Icon=/home/pradeep/.local/share/icons/fieldforce-admin.png
+Terminal=false
+Categories=Office;Development;Utility;
+StartupWMClass=fieldforce-admin
+Keywords=tracking;gps;admin;fieldforce;fleet;

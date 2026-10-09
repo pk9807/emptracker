@@ -12,6 +12,11 @@ class MapMarkerItem extends Equatable {
   final MarkerType type;
   final TrackingLiveStatus? liveStatus;
   final int? battery;
+  final String? avatarUrl;
+  final String? gender; // 'male', 'female', 'other'
+  final double? heading;
+  final double? speed;
+  final double? geofenceRadius;
   final dynamic originalData;
 
   const MapMarkerItem({
@@ -23,6 +28,11 @@ class MapMarkerItem extends Equatable {
     required this.type,
     this.liveStatus,
     this.battery,
+    this.avatarUrl,
+    this.gender,
+    this.heading,
+    this.speed,
+    this.geofenceRadius,
     this.originalData,
   });
 
@@ -36,5 +46,10 @@ class MapMarkerItem extends Equatable {
         type,
         liveStatus,
         battery,
+        avatarUrl,
+        gender,
+        heading,
+        speed,
+        geofenceRadius,
       ];
 }

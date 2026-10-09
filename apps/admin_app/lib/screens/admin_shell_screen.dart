@@ -1,4 +1,3 @@
-import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:firebase_repository/firebase_repository.dart';
 import 'package:flutter/material.dart';
@@ -161,6 +160,55 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
                       ],
                     ),
                   ),
+                  InkWell(
+                    onTap: () => AiAssistantModal.show(
+                      context,
+                      isAdmin: true,
+                      userName: widget.user.name,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)]),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.auto_awesome, size: 18, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text(
+                            'AI Assistant (AI सहायक)',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () => UserGuideModal.show(context, isAdmin: true),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.menu_book_rounded, size: 18, color: AppColors.primary),
+                          SizedBox(width: 8),
+                          Text(
+                            'User Guide (बहुभाषी)',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   const Divider(height: 1),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -203,8 +251,50 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
                 appBar: AppBar(
                   title: Text(_titles[_selectedIndex],
                       style: AppTypography.headingLarge(isDark: isDark)),
+                  actions: [
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        backgroundColor: const Color(0xFF6366F1).withValues(alpha: 0.15),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      ),
+                      icon: const Icon(Icons.auto_awesome, size: 18, color: Color(0xFF6366F1)),
+                      label: const Text(
+                        'AI Assistant (AI सहायक)',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6366F1), fontSize: 12),
+                      ),
+                      onPressed: () => AiAssistantModal.show(
+                        context,
+                        isAdmin: true,
+                        userName: widget.user.name,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      ),
+                      icon: const Icon(Icons.menu_book_rounded, size: 18, color: AppColors.primary),
+                      label: const Text(
+                        'User Guide (मार्गदर्शिका)',
+                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 12),
+                      ),
+                      onPressed: () => UserGuideModal.show(context, isAdmin: true),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
                 ),
                 body: pages[_selectedIndex],
+                floatingActionButton: FloatingActionButton.extended(
+                  onPressed: () => AiAssistantModal.show(
+                    context,
+                    isAdmin: true,
+                    userName: widget.user.name,
+                  ),
+                  backgroundColor: const Color(0xFF6366F1),
+                  icon: const Icon(Icons.auto_awesome, color: Colors.white),
+                  label: const Text('AI Assistant', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
               ),
             ),
           ],
@@ -217,9 +307,35 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
       appBar: AppBar(
         title: Text(_titles[_selectedIndex],
             style: AppTypography.headingLarge(isDark: isDark)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.auto_awesome, color: Color(0xFF6366F1)),
+            tooltip: 'AI Assistant',
+            onPressed: () => AiAssistantModal.show(
+              context,
+              isAdmin: true,
+              userName: widget.user.name,
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.menu_book_rounded, color: AppColors.primary),
+            tooltip: 'User Guide',
+            onPressed: () => UserGuideModal.show(context, isAdmin: true),
+          ),
+        ],
       ),
       body: pages[_selectedIndex],
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => AiAssistantModal.show(
+          context,
+          isAdmin: true,
+          userName: widget.user.name,
+        ),
+        backgroundColor: const Color(0xFF6366F1),
+        child: const Icon(Icons.auto_awesome, color: Colors.white),
+      ),
       bottomNavigationBar: NavigationBar(
+
         selectedIndex: _selectedIndex,
         onDestinationSelected: (idx) {
           setState(() {

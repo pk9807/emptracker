@@ -17,8 +17,8 @@ class InteractiveMapView extends StatefulWidget {
     required this.markers,
     this.selectedMarker,
     this.onMarkerTap,
-    this.centerLat = 28.6139,
-    this.centerLon = 77.2090,
+    this.centerLat = 26.4850,
+    this.centerLon = 80.3150,
     this.zoom = 14.0,
     this.is3DMode = true,
   });

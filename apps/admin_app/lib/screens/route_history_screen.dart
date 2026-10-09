@@ -51,8 +51,8 @@ class _RouteHistoryScreenState extends State<RouteHistoryScreen> {
   void _generateMockRoute() {
     final now = DateTime.now();
     final List<LocationPointModel> pts = [];
-    double lat = 28.6328;
-    double lon = 77.2197;
+    double lat = 26.4850;
+    double lon = 80.3150;
 
     for (int i = 0; i < 20; i++) {
       lat += (i % 2 == 0 ? 0.0012 : -0.0006);

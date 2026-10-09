@@ -28,10 +28,22 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailCtrl = TextEditingController(text: 'rahul.sharma@acme.com');
-  final _pwdCtrl = TextEditingController(text: 'password123');
+  final _emailCtrl = TextEditingController(text: 'rahul@fieldforce.com');
+  final _pwdCtrl = TextEditingController(text: 'Emp@123456');
   bool _isLoading = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Uri.base.queryParameters['autologin'] == '1' ||
+          Uri.base.queryParameters['autologin'] == 'true' ||
+          Uri.base.queryParameters['auto_duty'] == '1') {
+        _handleLogin();
+      }
+    });
+  }
 
   Future<void> _handleLogin() async {
     setState(() {
@@ -45,17 +57,18 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _pwdCtrl.text.trim(),
       );
 
-      final employee = await widget.empRepo.getEmployeeById('emp_001') ??
+      final employee = await widget.empRepo.getEmployeeById(user.uid) ??
+          await widget.empRepo.getEmployeeById('emp_001') ??
           EmployeeModel(
-            id: 'emp_001',
+            id: user.uid.isNotEmpty ? user.uid : 'emp_001',
             userId: user.uid,
             organizationId: user.organizationId,
             name: user.name,
-            employeeCode: 'EMP-DEL-01',
-            phone: user.phone ?? '+91 98765 43210',
+            employeeCode: 'EMP-101',
+            phone: user.phone ?? '+91 98111 22334',
             email: user.email,
-            designation: 'Field Sales Officer',
-            department: 'FMCG General Trade',
+            designation: 'Senior Field Executive',
+            department: 'Field Operations',
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
           );
@@ -158,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         CustomTextField(
                           controller: _emailCtrl,
                           label: 'Employee Email or Mobile',
-                          hintText: 'name@company.com',
+                          hintText: 'rahul@fieldforce.com',
                           prefixIcon: Icons.email_outlined,
                           keyboardType: TextInputType.emailAddress,
                         ),
@@ -175,6 +188,25 @@ class _LoginScreenState extends State<LoginScreen> {
                           text: 'SIGN IN TO DUTY',
                           isLoading: _isLoading,
                           onPressed: _handleLogin,
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextButton.icon(
+                                onPressed: _showServerSettingsDialog,
+                                icon: const Icon(Icons.settings_ethernet, size: 16),
+                                label: const Text('Server Settings', style: TextStyle(fontSize: 12)),
+                              ),
+                            ),
+                            Expanded(
+                              child: TextButton.icon(
+                                onPressed: _loginOfflineMode,
+                                icon: const Icon(Icons.offline_bolt, size: 16),
+                                label: const Text('Offline Demo Mode', style: TextStyle(fontSize: 12)),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -200,6 +232,123 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _loginOfflineMode() {
+    final offlineUser = UserModel(
+      uid: '2',
+      email: _emailCtrl.text.trim().isNotEmpty ? _emailCtrl.text.trim() : 'rahul@fieldforce.com',
+      name: 'Rahul Sharma',
+      role: UserRole.employee,
+      organizationId: 'org_acme_fmcg',
+      employeeId: 'EMP-101',
+      phone: '+91 98111 22334',
+      active: true,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    final offlineEmp = EmployeeModel(
+      id: '2',
+      userId: '2',
+      organizationId: 'org_acme_fmcg',
+      name: 'Rahul Sharma',
+      employeeCode: 'EMP-101',
+      phone: '+91 98111 22334',
+      email: 'rahul@fieldforce.com',
+      designation: 'Senior Field Executive',
+      department: 'FMCG Sales',
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => EmployeeHomeScreen(
+          user: offlineUser,
+          employee: offlineEmp,
+          empRepo: widget.empRepo,
+          shopRepo: widget.shopRepo,
+          visitRepo: widget.visitRepo,
+          attRepo: widget.attRepo,
+          locRepo: widget.locRepo,
+        ),
+      ),
+    );
+  }
+
+  void _showServerSettingsDialog() {
+    final currentUrl = ApiClient().baseUrl;
+    final ctrl = TextEditingController(text: currentUrl);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.dns, color: AppColors.primary),
+            SizedBox(width: 8),
+            Text('Backend Server API URL', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Specify your Laravel REST API endpoint:',
+              style: TextStyle(fontSize: 13, color: Colors.grey),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: ctrl,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                isDense: true,
+                hintText: 'http://192.168.0.108/...',
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text('Quick Presets:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: [
+                ActionChip(
+                  label: const Text('Wi-Fi (192.168.0.108)', style: TextStyle(fontSize: 11)),
+                  onPressed: () => ctrl.text = 'http://192.168.0.108/emptracker/backend/public/index.php/api',
+                ),
+                ActionChip(
+                  label: const Text('Emulator (10.0.2.2)', style: TextStyle(fontSize: 11)),
+                  onPressed: () => ctrl.text = 'http://10.0.2.2/emptracker/backend/public/index.php/api',
+                ),
+                ActionChip(
+                  label: const Text('Localhost (Web)', style: TextStyle(fontSize: 11)),
+                  onPressed: () => ctrl.text = 'http://localhost/emptracker/backend/public/index.php/api',
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              ApiClient().setBaseUrl(ctrl.text.trim());
+              Navigator.of(ctx).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Server URL updated to: ${ctrl.text.trim()}')),
+              );
+            },
+            child: const Text('Save & Apply'),
+          ),
+        ],
       ),
     );
   }

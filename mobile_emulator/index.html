@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FieldForce Pro — Flagship Android APK Mobile Device Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --panel-bg: rgba(15, 23, 42, 0.75);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --accent-green: #00ffaa;
+      --accent-blue: #00b4d8;
+      --accent-cyan: #38bdf8;
+      --phone-width: 412px;
+      --phone-height: 870px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 20%, #0d1527 0%, var(--bg-dark) 100%);
+      font-family: 'Inter', sans-serif;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      padding: 20px;
+    }
+
+    /* Top Studio Header */
+    .studio-header {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 14px 24px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #00ffaa, #00b4d8);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 18px rgba(0, 255, 170, 0.4);
+    }
+
+    .brand-text h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      background: linear-gradient(90deg, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      font-size: 12px;
+      color: var(--accent-green);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      background: rgba(0, 255, 170, 0.15);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      box-shadow: 0 0 15px rgba(0, 255, 170, 0.25);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00ffaa 0%, #00b4d8 100%);
+      color: #050b14;
+      border: none;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 25px rgba(0, 255, 170, 0.5);
+      transform: translateY(-1px);
+    }
+
+    /* Studio Main Stage */
+    .studio-stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    /* Flagship Phone Shell (Pixel 8 / Galaxy S24 Ultra style) */
+    .phone-wrapper {
+      position: relative;
+      width: var(--phone-width);
+      height: var(--phone-height);
+      background: #11141c;
+      border-radius: 54px;
+      padding: 14px;
+      box-shadow: 
+        0 0 0 4px #232936,
+        0 0 0 8px #090c12,
+        0 30px 80px rgba(0, 0, 0, 0.8),
+        0 0 40px rgba(0, 255, 170, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* Side hardware buttons */
+    .phone-wrapper::before {
+      content: '';
+      position: absolute;
+      left: -12px;
+      top: 140px;
+      width: 4px;
+      height: 70px;
+      background: #2a3342;
+      border-radius: 3px 0 0 3px;
+    }
+
+    .phone-wrapper::after {
+      content: '';
+      position: absolute;
+      right: -12px;
+      top: 170px;
+      width: 4px;
+      height: 48px;
+      background: #2a3342;
+      border-radius: 0 3px 3px 0;
+    }
+
+    /* Screen Glass Inner */
+    .phone-screen {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      border-radius: 42px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Android Dynamic Status Bar */
+    .android-status-bar {
+      height: 38px;
+      background: #0b0f19;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #e2e8f0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Camera Hole Cutout */
+    .punch-hole-camera {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 15px;
+      height: 15px;
+      background: #000;
+      border-radius: 50%;
+      border: 1.5px solid #1a2230;
+      box-shadow: inset 0 0 4px #00ffaa;
+      z-index: 101;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    /* App Viewport Iframe */
+    .app-frame {
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 64px);
+      border: none;
+      background: #07090e;
+    }
+
+    /* Android Bottom Navigation Pill Bar */
+    .android-nav-bar {
+      height: 26px;
+      background: #0b0f19;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .nav-pill {
+      width: 110px;
+      height: 4.5px;
+      background: #94a3b8;
+      border-radius: 10px;
+      opacity: 0.6;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .nav-pill:hover {
+      opacity: 1;
+      background: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green);
+    }
+
+    /* Side Simulator Control Panel */
+    .control-panel {
+      width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .panel-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .panel-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .badge-value {
+      background: rgba(0, 255, 170, 0.1);
+      border: 1px solid rgba(0, 255, 170, 0.3);
+      color: var(--accent-green);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    .quick-preset-btn {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .quick-preset-btn:hover {
+      background: rgba(0, 180, 216, 0.15);
+      border-color: var(--accent-blue);
+      color: #fff;
+    }
+
+    /* Live Watermark Camera Preview Overlay */
+    .watermark-overlay-preview {
+      position: absolute;
+      bottom: 40px;
+      left: 14px;
+      right: 14px;
+      background: rgba(0, 0, 0, 0.85);
+      border: 1px solid rgba(0, 255, 170, 0.5);
+      border-radius: 12px;
+      padding: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #00ffaa;
+      display: none;
+      z-index: 200;
+      backdrop-filter: blur(10px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Studio Header -->
+  <header class="studio-header">
+    <div class="brand-title">
+      <div class="brand-badge">📱</div>
+      <div class="brand-text">
+        <h1>FieldForce Pro — Real Android APK Simulator</h1>
+        <p>BUILD: v2.4.0-RELEASE (SDK 34 / ANDROID 14)</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-action" onclick="reloadApp()">🔄 Reload APK</button>
+      <button class="btn-action" onclick="toggleWatermarkPreview()">📸 Watermark Lens</button>
+      <button class="btn-action btn-primary" onclick="openAdminCenter()">💻 Open Admin Center</button>
+    </div>
+  </header>
+
+  <!-- Studio Main Stage -->
+  <main class="studio-stage">
+    
+    <!-- Ultra Realistic Android Phone -->
+    <div class="phone-wrapper">
+      
+      <div class="phone-screen">
+        <!-- Punch Hole Camera -->
+        <div class="punch-hole-camera"></div>
+
+        <!-- Android Status Bar -->
+        <div class="android-status-bar">
+          <span id="android-clock">12:30</span>
+          <div class="status-icons">
+            <span>5G</span>
+            <span>📶</span>
+            <span id="battery-indicator">⚡ 98%</span>
+          </div>
+        </div>
+
+        <!-- App Iframe -->
+        <iframe id="employee-app-frame" class="app-frame" src="http://localhost/emptracker/employee/?autologin=1"></iframe>
+
+        <!-- Simulated Watermark Overlay -->
+        <div id="watermark-overlay" class="watermark-overlay-preview">
+          <div>📍 LAT: 26.4850° N | LNG: 80.3150° E</div>
+          <div>🏢 SHOP: Workout Gym Swaroop Nagar Kanpur (GEOFENCED)</div>
+          <div>👤 EMP: Rahul Sharma (EMP-101)</div>
+          <div id="watermark-time">⏰ TIMESTAMP: 2026-10-08 14:15:00 IST</div>
+          <div>🔒 SHA256: 8f4e2a9b1c7d... [AUTHENTICATED]</div>
+        </div>
+
+        <!-- Android Nav Bar -->
+        <div class="android-nav-bar">
+          <div class="nav-pill" onclick="reloadApp()"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Simulator Controls -->
+    <aside class="control-panel">
+      
+      <!-- Device Telemetry -->
+      <div class="panel-card">
+        <h3>⚡ Real Device Telemetry</h3>
+        <div class="panel-row">
+          <span>Device Model</span>
+          <span class="badge-value">Google Pixel 8 Pro</span>
+        </div>
+        <div class="panel-row">
+          <span>OS Version</span>
+          <span class="badge-value">Android 14 (Upside Down Cake)</span>
+        </div>
+        <div class="panel-row">
+          <span>GPS Accuracy</span>
+          <span class="badge-value">3.2 meters (Fused GPS)</span>
+        </div>
+        <div class="panel-row">
+          <span>Offline Sync Engine</span>
+          <span class="badge-value">SQLite Active (0 Queue)</span>
+        </div>
+      </div>
+
+      <!-- Quick Geofence Locations -->
+      <div class="panel-card">
+        <h3>📍 Simulated GPS Coordinates (Kanpur Default)</h3>
+        <button class="quick-preset-btn" onclick="setGpsLocation(26.4850, 80.3150, 'Workout Gym & Fitness Swaroop Nagar')">
+          <span>🏋️‍♂️ Workout Gym Swaroop Nagar</span>
+          <span>26.48° N, 80.31° E</span>
+        </button>
+        <button class="quick-preset-btn" onclick="setGpsLocation(26.4725, 80.3522, 'Z Square Mall Civil Lines')">
+          <span>🏬 Z Square Mall Civil Lines</span>
+          <span>26.47° N, 80.35° E</span>
+        </button>
+        <button class="quick-preset-btn" onclick="setGpsLocation(26.4812, 80.2928, 'Kakadeo Trade Hub')">
+          <span>🏢 Kakadeo Commercial Hub</span>
+          <span>26.48° N, 80.29° E</span>
+        </button>
+        <button class="quick-preset-btn" onclick="setGpsLocation(26.4907, 80.3185, 'Tilak Nagar Super Store')">
+          <span>🏪 Tilak Nagar Super Store</span>
+          <span>26.49° N, 80.31° E</span>
+        </button>
+      </div>
+
+      <!-- Sanitized Store Locator Engine (storelocatorjs Skill) -->
+      <div class="panel-card" style="border-color: rgba(0, 255, 170, 0.3);">
+        <h3>🏪 Sanitized Store Locator (Kanpur Hub)</h3>
+        <input 
+          type="text" 
+          id="store-search-input" 
+          placeholder="🔍 Search Workout Gym, Z Square, Kakadeo..." 
+          oninput="filterStoresLive()"
+          style="width: 100%; background: #0b0f19; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; outline: none;"
+        />
+        <div id="store-locator-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Live Actions -->
+      <div class="panel-card">
+        <h3>🤖 Autonomous Actions</h3>
+        <button class="quick-preset-btn" style="border-color: rgba(0,255,170,0.4); color: var(--accent-green);" onclick="triggerAutoDuty()">
+          <span>🟢 Automated Duty Punch-In</span>
+          <span>▶ Run</span>
+        </button>
+        <button class="quick-preset-btn" style="border-color: rgba(0,180,216,0.4); color: var(--accent-blue);" onclick="triggerShopVisit()">
+          <span>📸 Verified Shop Check-In</span>
+          <span>▶ Run</span>
+        </button>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <script>
+    // Live Android Clock
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('android-clock').innerText = `${hours}:${minutes}`;
+      const timeStr = now.toISOString().replace('T', ' ').substring(0, 19);
+      document.getElementById('watermark-time').innerText = `⏰ TIMESTAMP: ${timeStr} IST`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function reloadApp() {
+      const frame = document.getElementById('employee-app-frame');
+      frame.src = frame.src;
+    }
+
+    function openAdminCenter() {
+      window.open('http://localhost/emptracker/admin/', '_blank');
+    }
+
+    let isWatermarkVisible = false;
+    function toggleWatermarkPreview() {
+      isWatermarkVisible = !isWatermarkVisible;
+      document.getElementById('watermark-overlay').style.display = isWatermarkVisible ? 'block' : 'none';
+    }
+
+    // Store Locator Engine & Data (Default: Kanpur Hub)
+    const mockShops = [
+      { id: '1', name: 'Workout Gym & Fitness Center', address: 'Plot 14, Arya Nagar, Swaroop Nagar, Kanpur', lat: 26.4850, lng: 80.3150, radius: 100 },
+      { id: '2', name: 'Z Square Mall Mega Store', address: '16/113 MG Road, Civil Lines, Kanpur', lat: 26.4725, lng: 80.3522, radius: 120 },
+      { id: '3', name: 'Tilak Nagar Super Store (FF Sports)', address: 'Plot 45, Tilak Nagar, Kanpur', lat: 26.4907, lng: 80.3185, radius: 80 },
+      { id: '4', name: 'Anytime Fitness & Crossfit', address: 'Deoki Palace Crossing, Kakadeo, Kanpur', lat: 26.4812, lng: 80.2928, radius: 90 },
+      { id: '5', name: 'Naveen Market Retail Hub', address: 'Naveen Market, Downtown, Kanpur', lat: 26.4670, lng: 80.3500, radius: 110 },
+      { id: '6', name: 'Company Bagh Retail Center', address: 'Near Phool Bagh / Company Bagh, Kanpur', lat: 26.4910, lng: 80.3161, radius: 70 }
+    ];
+
+    let currentLat = 26.4850;
+    let currentLng = 80.3150;
+
+    function sanitizeText(str) {
+      if (!str) return '';
+      return str.replace(/<[^>]*>?/gm, '').trim().toLowerCase();
+    }
+
+    function haversineDistMeters(lat1, lon1, lat2, lon2) {
+      const R = 6371000;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    function filterStoresLive() {
+      const input = document.getElementById('store-search-input');
+      renderStoreLocator(input ? input.value : '');
+    }
+
+    function renderStoreLocator(query = '') {
+      const cleanQ = sanitizeText(query);
+      const listEl = document.getElementById('store-locator-list');
+      if (!listEl) return;
+
+      const scored = mockShops.map(s => {
+        const dist = haversineDistMeters(currentLat, currentLng, s.lat, s.lng);
+        const inside = dist <= s.radius;
+        return { ...s, dist, inside };
+      }).filter(s => {
+        if (!cleanQ) return true;
+        return s.name.toLowerCase().includes(cleanQ) || s.address.toLowerCase().includes(cleanQ);
+      }).sort((a, b) => a.dist - b.dist);
+
+      listEl.innerHTML = scored.map(s => `
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid ${s.inside ? 'rgba(0,255,170,0.4)' : 'rgba(255,255,255,0.08)'}; border-radius: 8px; padding: 8px 10px; font-size: 11px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="color:#f1f5f9;">${s.name}</strong>
+            <span style="color:${s.inside ? '#00ffaa' : '#38bdf8'}; font-weight:700;">
+              ${s.dist < 1000 ? Math.round(s.dist) + ' m' : (s.dist/1000).toFixed(1) + ' km'}
+            </span>
+          </div>
+          <div style="color:#94a3b8; font-size:10px; margin-top:2px;">${s.address}</div>
+          <div style="margin-top:6px; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:9px; color:${s.inside ? '#00ffaa' : '#94a3b8'}; font-weight:600;">
+              ${s.inside ? '🎯 INSIDE GEOFENCE' : '📍 ' + Math.round(s.dist) + 'm away'}
+            </span>
+            <button onclick="window.open('https://www.google.com/maps/dir/?api=1&origin=${currentLat},${currentLng}&destination=${s.lat},${s.lng}&travelmode=driving', '_blank')" style="background:rgba(0,180,216,0.2); border:1px solid #00b4d8; color:#fff; border-radius:4px; padding:2px 6px; font-size:9px; cursor:pointer;">
+              🗺️ Nav
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setGpsLocation(lat, lng, name) {
+      currentLat = lat;
+      currentLng = lng;
+      renderStoreLocator();
+      const frame = document.getElementById('employee-app-frame');
+      frame.src = `http://localhost/emptracker/employee/?autologin=1&lat=${lat}&lng=${lng}`;
+      const overlay = document.getElementById('watermark-overlay');
+      if (overlay) {
+        overlay.innerHTML = `
+          <div>📍 LAT: ${lat.toFixed(4)}° N | LNG: ${lng.toFixed(4)}° E</div>
+          <div>🏢 LOCATION: ${name} (GEOFENCED)</div>
+          <div>👤 EMP: Rahul Sharma (EMP-101)</div>
+          <div id="watermark-time">⏰ TIMESTAMP: ${new Date().toISOString().replace('T', ' ').substring(0, 19)} IST</div>
+          <div>🔒 SHA256: 8f4e2a9b1c7d... [AUTHENTICATED]</div>
+        `;
+      }
+    }
+
+    function triggerAutoDuty() {
+      const frame = document.getElementById('employee-app-frame');
+      frame.src = 'http://localhost/emptracker/employee/?autologin=1&auto_duty=1';
+    }
+
+    function triggerShopVisit() {
+      const frame = document.getElementById('employee-app-frame');
+      frame.src = 'http://localhost/emptracker/employee/?autologin=1';
+    }
+
+    // Initial render
+    renderStoreLocator();
+  </script>
+</body>
+</html>

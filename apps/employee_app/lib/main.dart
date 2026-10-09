@@ -6,12 +6,13 @@ import 'screens/login_screen.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final authRepo = MockAuthRepository();
-  final empRepo = MockEmployeeRepository();
-  final shopRepo = MockShopRepository();
-  final visitRepo = MockVisitRepository();
-  final attRepo = MockAttendanceRepository();
-  final locRepo = MockLocationRepository();
+  // Dynamic Laravel REST API Repositories
+  final authRepo = LaravelAuthRepository();
+  final empRepo = LaravelEmployeeRepository();
+  final shopRepo = LaravelShopRepository();
+  final visitRepo = LaravelVisitRepository();
+  final attRepo = LaravelAttendanceRepository();
+  final locRepo = LaravelLocationRepository();
 
   runApp(
     FieldForceEmployeeApp(

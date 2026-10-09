@@ -14,3 +14,6 @@ export 'components/skeleton_loader.dart';
 export 'components/metric_counter_card.dart';
 export 'components/empty_state_view.dart';
 export 'components/app_logo_badge.dart';
+export 'components/user_guide_modal.dart';
+export 'components/ai_assistant_modal.dart';
+

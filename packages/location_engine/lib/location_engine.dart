@@ -58,17 +58,17 @@ class LocationEngine {
       notificationBody: 'Your live route is being recorded for field operations.',
     );
 
-    // Initial seed location (e.g. Connaught Place, New Delhi)
+    // Initial seed location (e.g. Swaroop Nagar, Kanpur)
     _currentLocation = LiveLocationModel(
       employeeId: employeeId,
       organizationId: organizationId,
       name: employeeName,
-      latitude: 28.6328,
-      longitude: 77.2197,
+      latitude: 26.4850,
+      longitude: 80.3150,
       accuracy: 5.0,
       speed: 0.0,
       heading: 0.0,
-      altitude: 215.0,
+      altitude: 126.0,
       battery: 88,
       updatedAt: DateTime.now(),
     );

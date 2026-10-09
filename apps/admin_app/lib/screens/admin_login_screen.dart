@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import 'package:firebase_repository/firebase_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:models/models.dart';
 import 'admin_shell_screen.dart';
 
 class AdminLoginScreen extends StatefulWidget {
@@ -27,10 +28,22 @@ class AdminLoginScreen extends StatefulWidget {
 }
 
 class _AdminLoginScreenState extends State<AdminLoginScreen> {
-  final _emailCtrl = TextEditingController(text: 'admin@acme.com');
-  final _pwdCtrl = TextEditingController(text: 'admin123456');
+  final _emailCtrl = TextEditingController(text: 'admin@fieldforce.com');
+  final _pwdCtrl = TextEditingController(text: 'Admin@123456');
   bool _isLoading = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Uri.base.queryParameters['autologin'] == '1' ||
+          Uri.base.queryParameters['autologin'] == 'true' ||
+          Uri.base.queryParameters['token'] != null) {
+        _handleLogin();
+      }
+    });
+  }
 
   Future<void> _handleLogin() async {
     setState(() {
@@ -147,7 +160,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         CustomTextField(
                           controller: _emailCtrl,
                           label: 'Admin Email',
-                          hintText: 'admin@organization.com',
+                          hintText: 'admin@fieldforce.com',
                           prefixIcon: Icons.business,
                           keyboardType: TextInputType.emailAddress,
                         ),
@@ -164,6 +177,25 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                           text: 'LAUNCH DASHBOARD',
                           isLoading: _isLoading,
                           onPressed: _handleLogin,
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextButton.icon(
+                                onPressed: _showServerSettingsDialog,
+                                icon: const Icon(Icons.settings_ethernet, size: 16),
+                                label: const Text('Server Settings', style: TextStyle(fontSize: 12)),
+                              ),
+                            ),
+                            Expanded(
+                              child: TextButton.icon(
+                                onPressed: _loginOfflineMode,
+                                icon: const Icon(Icons.offline_bolt, size: 16),
+                                label: const Text('Offline Demo Mode', style: TextStyle(fontSize: 12)),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -189,6 +221,109 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _loginOfflineMode() {
+    final offlineUser = UserModel(
+      uid: '1',
+      email: _emailCtrl.text.trim().isNotEmpty ? _emailCtrl.text.trim() : 'admin@fieldforce.com',
+      name: 'FieldForce Master Admin',
+      role: UserRole.admin,
+      organizationId: 'org_acme_fmcg',
+      employeeId: 'ADM-001',
+      phone: '+91 98765 43210',
+      active: true,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => AdminShellScreen(
+          user: offlineUser,
+          authRepo: widget.authRepo,
+          empRepo: widget.empRepo,
+          shopRepo: widget.shopRepo,
+          visitRepo: widget.visitRepo,
+          attRepo: widget.attRepo,
+          locRepo: widget.locRepo,
+        ),
+      ),
+    );
+  }
+
+  void _showServerSettingsDialog() {
+    final currentUrl = ApiClient().baseUrl;
+    final ctrl = TextEditingController(text: currentUrl);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.dns, color: AppColors.primary),
+            SizedBox(width: 8),
+            Text('Backend Server API URL', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Specify your Laravel REST API endpoint:',
+              style: TextStyle(fontSize: 13, color: Colors.grey),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: ctrl,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                isDense: true,
+                hintText: 'http://192.168.0.108/...',
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text('Quick Presets:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: [
+                ActionChip(
+                  label: const Text('Wi-Fi (192.168.0.108)', style: TextStyle(fontSize: 11)),
+                  onPressed: () => ctrl.text = 'http://192.168.0.108/emptracker/backend/public/index.php/api',
+                ),
+                ActionChip(
+                  label: const Text('Emulator (10.0.2.2)', style: TextStyle(fontSize: 11)),
+                  onPressed: () => ctrl.text = 'http://10.0.2.2/emptracker/backend/public/index.php/api',
+                ),
+                ActionChip(
+                  label: const Text('Localhost (Web)', style: TextStyle(fontSize: 11)),
+                  onPressed: () => ctrl.text = 'http://localhost/emptracker/backend/public/index.php/api',
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              ApiClient().setBaseUrl(ctrl.text.trim());
+              Navigator.of(ctx).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Server URL updated to: ${ctrl.text.trim()}')),
+              );
+            },
+            child: const Text('Save & Apply'),
+          ),
+        ],
       ),
     );
   }

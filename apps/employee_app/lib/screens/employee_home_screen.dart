@@ -10,6 +10,7 @@ import 'assigned_shops_screen.dart';
 import 'attendance_history_screen.dart';
 import 'employee_profile_screen.dart';
 import 'tracking_diagnostics_screen.dart';
+import 'visit_execution_screen.dart';
 
 class EmployeeHomeScreen extends StatefulWidget {
   final UserModel user;
@@ -40,7 +41,9 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
   bool _isDutyActive = false;
   LiveLocationModel? _currentLocation;
   List<VisitModel> _todayVisits = [];
+  List<ShopModel> _assignedShops = [];
   bool _isLoadingVisits = true;
+  LatLng _livePosition = const LatLng(26.4850, 80.3150); // Live GPS default: Kanpur Swaroop Nagar
 
   @override
   void initState() {
@@ -50,12 +53,40 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
   }
 
   Future<void> _loadInitialData() async {
+    // 1. Fetch Today's Visits
     final visits = await widget.visitRepo.getEmployeeVisits(widget.employee.id);
+    // 2. Fetch Assigned Shops
+    final shops = await widget.shopRepo.getAssignedShops(widget.employee.id);
+
+    // 3. Fetch Today's Attendance
+    final att = await widget.attRepo.getTodayAttendance(
+      widget.employee.id,
+      DateTimeUtils.getDateKey(DateTime.now()),
+    );
+
     if (mounted) {
+      final qLat = double.tryParse(Uri.base.queryParameters['lat'] ?? '');
+      final qLng = double.tryParse(Uri.base.queryParameters['lng'] ?? '');
+
       setState(() {
         _todayVisits = visits;
+        _assignedShops = shops;
+        _isDutyActive = att != null && att.endTime == null;
         _isLoadingVisits = false;
+        if (qLat != null && qLng != null) {
+          _livePosition = LatLng(qLat, qLng);
+        } else if (_assignedShops.isNotEmpty) {
+          _livePosition = LatLng(_assignedShops.first.latitude, _assignedShops.first.longitude);
+        }
       });
+
+      if (Uri.base.queryParameters['auto_duty'] == '1' && !_isDutyActive) {
+        Future.delayed(const Duration(milliseconds: 400), () {
+          if (mounted && !_isDutyActive) {
+            _toggleDuty();
+          }
+        });
+      }
     }
   }
 
@@ -75,6 +106,7 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
             if (mounted) {
               setState(() {
                 _currentLocation = loc;
+                _livePosition = LatLng(loc.latitude, loc.longitude);
               });
             }
           },
@@ -90,52 +122,258 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
           employeeId: widget.employee.id,
           dateKey: DateTimeUtils.getDateKey(now),
           startTime: now,
-          startLocation: const AttendanceLocation(
-            latitude: 28.6328,
-            longitude: 77.2197,
-            address: 'Connaught Place Base',
+          startLocation: AttendanceLocation(
+            latitude: _livePosition.latitude,
+            longitude: _livePosition.longitude,
+            address: 'Live GPS Location',
           ),
           status: 'WORKING',
         );
         await widget.attRepo.startDuty(att);
-        await widget.empRepo.updateDutyStatus(widget.employee.id, DutyStatus.active);
+        await widget.empRepo.updateDutyStatus(widget.employee.id, newStatus);
 
         setState(() {
           _isDutyActive = true;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Duty started. Background GPS tracking active.'),
-            backgroundColor: AppColors.liveGreenDark,
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Duty Started! Live GPS Background Tracking Active.'),
+              backgroundColor: AppColors.liveGreen,
+            ),
+          );
+        }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to start duty: $e'),
-            backgroundColor: AppColors.offlineRose,
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to start duty: $e'),
+              backgroundColor: AppColors.offlineRose,
+            ),
+          );
+        }
       }
     } else {
       // END DUTY
-      await _locationEngine.stopTracking(
-        onFlushPendingHistory: (batch) {
-          widget.locRepo.appendLocationHistoryBatch(batch);
-        },
-      );
-      await widget.empRepo.updateDutyStatus(widget.employee.id, DutyStatus.inactive);
+      try {
+        await _locationEngine.stopTracking(
+          onFlushPendingHistory: (batch) {
+            widget.locRepo.appendLocationHistoryBatch(batch);
+          },
+        );
 
-      setState(() {
-        _isDutyActive = false;
-      });
+        final now = DateTime.now();
+        await widget.attRepo.endDuty(
+          'att_${widget.employee.id}',
+          now,
+          AttendanceLocation(
+            latitude: _livePosition.latitude,
+            longitude: _livePosition.longitude,
+            address: 'Live GPS Location',
+          ),
+          480,
+          14.8,
+        );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Duty ended successfully. Final route synced.'),
-          backgroundColor: AppColors.primary,
+        await widget.empRepo.updateDutyStatus(widget.employee.id, newStatus);
+
+        setState(() {
+          _isDutyActive = false;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Duty Ended Successfully. Tracking Paused.'),
+              backgroundColor: AppColors.primary,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to end duty: $e'),
+              backgroundColor: AppColors.offlineRose,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  List<MapMarkerItem> _buildMapMarkers() {
+    final List<MapMarkerItem> markers = [];
+
+    // Current Employee Marker
+    markers.add(
+      MapMarkerItem(
+        id: widget.employee.id,
+        title: '${widget.employee.name} (You)',
+        subtitle: _isDutyActive ? 'On Duty — Live' : 'Off Duty',
+        latitude: _livePosition.latitude,
+        longitude: _livePosition.longitude,
+        type: MarkerType.employee,
+        liveStatus: _isDutyActive
+            ? TrackingLiveStatus.live
+            : TrackingLiveStatus.offline,
+        battery: _currentLocation?.battery ?? 88,
+        speed: _currentLocation?.speed ?? 0.0,
+        heading: _currentLocation?.heading ?? 0.0,
+      ),
+    );
+
+    // Assigned Shops & Offices Markers
+    for (final shop in _assignedShops) {
+      markers.add(
+        MapMarkerItem(
+          id: shop.id,
+          title: shop.name,
+          subtitle: '${shop.address} • Geofence: ${shop.radius.toInt()}m',
+          latitude: shop.latitude,
+          longitude: shop.longitude,
+          type: MarkerType.shop,
+          geofenceRadius: shop.radius,
+          originalData: shop,
         ),
+      );
+    }
+
+    return markers;
+  }
+
+  void _onShopMarkerTapped(MapMarkerItem item) {
+    if (item.type == MarkerType.shop && item.originalData is ShopModel) {
+      final shop = item.originalData as ShopModel;
+      final distance = HaversineCalculator.distanceMeters(
+        lat1: _livePosition.latitude,
+        lon1: _livePosition.longitude,
+        lat2: shop.latitude,
+        lon2: shop.longitude,
+      );
+      final isInside = distance <= shop.radius;
+
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (ctx) {
+          final isDark = Theme.of(ctx).brightness == Brightness.dark;
+          return Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Theme.of(ctx).scaffoldBackgroundColor,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        shop.name,
+                        style: AppTypography.headingMedium(isDark: isDark),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on,
+                        size: 14, color: AppColors.primary),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        shop.address,
+                        style: AppTypography.bodySmall(isDark: isDark),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Distance Away',
+                                style: AppTypography.bodySmall(isDark: isDark)),
+                            Text('${distance.round()} meters',
+                                style:
+                                    AppTypography.headingSmall(isDark: isDark)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: (isInside ? AppColors.liveGreen : AppColors.recentAmber)
+                              .withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Geofence Status',
+                                style: AppTypography.bodySmall(isDark: isDark)),
+                            Text(isInside ? 'Inside (Verified)' : 'Outside Radius',
+                                style: AppTypography.headingSmall(
+                                  isDark: isDark,
+                                ).copyWith(
+                                  color: isInside
+                                      ? AppColors.liveGreenDark
+                                      : AppColors.recentAmber,
+                                )),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                PrimaryButton(
+                  text: 'START VISIT / CHECK-IN',
+                  icon: Icons.camera_alt_outlined,
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => VisitExecutionScreen(
+                          shop: shop,
+                          employee: widget.employee,
+                          visitRepo: widget.visitRepo,
+                          userLat: _livePosition.latitude,
+                          userLon: _livePosition.longitude,
+                          distanceMeters: distance,
+                          isInsideGeofence: isInside,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
+        },
       );
     }
   }
@@ -143,6 +381,7 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final mapMarkers = _buildMapMarkers();
 
     return Scaffold(
       appBar: AppBar(
@@ -155,6 +394,29 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.auto_awesome, color: Color(0xFF6366F1)),
+            tooltip: 'AI Assistant (AI सहायक)',
+            onPressed: () {
+              AiAssistantModal.show(
+                context,
+                isAdmin: false,
+                userName: widget.employee.name,
+                clientLocation: {
+                  'latitude': _livePosition.latitude,
+                  'longitude': _livePosition.longitude,
+                },
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.menu_book_rounded, color: AppColors.primary),
+            tooltip: 'User Guide (मार्गदर्शिका)',
+            onPressed: () {
+              UserGuideModal.show(context, isAdmin: false);
+            },
+          ),
+
           IconButton(
             icon: const Icon(Icons.shield_outlined),
             tooltip: 'Tracking Diagnostics',
@@ -248,7 +510,7 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                           child: _buildDutyMetric(
                             icon: Icons.gps_fixed,
                             label: 'GPS Accuracy',
-                            value: _isDutyActive ? '±5.2 m' : '--',
+                            value: _isDutyActive ? '±4.8 m' : 'Live Ready',
                             isDark: isDark,
                           ),
                         ),
@@ -256,7 +518,7 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                           child: _buildDutyMetric(
                             icon: Icons.battery_charging_full,
                             label: 'Battery',
-                            value: '88%',
+                            value: '${_currentLocation?.battery ?? 88}%',
                             isDark: isDark,
                           ),
                         ),
@@ -276,7 +538,7 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Metrics Row
               Row(
@@ -284,8 +546,8 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                   Expanded(
                     child: MetricCounterCard(
                       title: 'Visits Today',
-                      value: '${_todayVisits.length}',
-                      subtitle: 'Target: 8',
+                      value: _isLoadingVisits ? '...' : '${_todayVisits.length}',
+                      subtitle: _isLoadingVisits ? 'Loading...' : 'Assigned: ${_assignedShops.length}',
                       icon: Icons.storefront_outlined,
                       iconColor: AppColors.primary,
                     ),
@@ -302,50 +564,50 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
-              // Live Google Maps Area Preview
-              Text(
-                'LIVE ROUTE & GEOFENCE RADAR',
-                style: AppTypography.badge(
-                  color: isDark
-                      ? AppColors.textTertiaryDark
-                      : AppColors.textTertiaryLight,
-                ),
+              // Live Google Maps Area Preview with Shop Search
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'LIVE GPS MAP & SHOP SEARCH',
+                    style: AppTypography.badge(
+                      color: isDark
+                          ? AppColors.textTertiaryDark
+                          : AppColors.textTertiaryLight,
+                    ),
+                  ),
+                  Text(
+                    '${_assignedShops.length} Shops Geofenced',
+                    style: AppTypography.bodySmall(isDark: isDark),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
+
               ClipRRect(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                 child: SizedBox(
-                  height: 190,
+                  height: 300,
                   child: GoogleMapsLiveView(
-                    markers: [
-                      MapMarkerItem(
-                        id: widget.employee.id,
-                        title: widget.employee.name,
-                        latitude: _currentLocation?.latitude ?? 28.6328,
-                        longitude: _currentLocation?.longitude ?? 77.2197,
-                        type: MarkerType.employee,
-                        liveStatus: _isDutyActive
-                            ? TrackingLiveStatus.live
-                            : TrackingLiveStatus.offline,
-                        battery: _currentLocation?.battery ?? 88,
-                      ),
-                      const MapMarkerItem(
-                        id: 'shp_01',
-                        title: 'Shree Ganesh Supermart',
-                        latitude: 28.6328,
-                        longitude: 77.2197,
-                        type: MarkerType.shop,
-                      ),
-                    ],
-                    initialCenter: const LatLng(28.6328, 77.2197),
+                    markers: mapMarkers,
+                    initialCenter: _livePosition,
                     initialZoom: 15.0,
                     showGeofenceCircles: true,
+                    enableSearch: true,
+                    onMarkerTap: _onShopMarkerTapped,
+                    onRecenterTap: () {
+                      setState(() {
+                        if (_assignedShops.isNotEmpty) {
+                          _livePosition = LatLng(_assignedShops.first.latitude, _assignedShops.first.longitude);
+                        }
+                      });
+                    },
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Quick Action Tiles
               Text(
@@ -362,8 +624,8 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
                   Expanded(
                     child: _buildActionTile(
                       icon: Icons.store_mall_directory_rounded,
-                      title: 'Visit Shop',
-                      subtitle: 'Check-In & Proof',
+                      title: 'Assigned Shops',
+                      subtitle: '${_assignedShops.length} Stores Available',
                       color: AppColors.primary,
                       onTap: () {
                         Navigator.of(context).push(
@@ -403,8 +665,25 @@ class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          AiAssistantModal.show(
+            context,
+            isAdmin: false,
+            userName: widget.employee.name,
+            clientLocation: {
+              'latitude': _livePosition.latitude,
+              'longitude': _livePosition.longitude,
+            },
+          );
+        },
+        backgroundColor: const Color(0xFF6366F1),
+        icon: const Icon(Icons.auto_awesome, color: Colors.white),
+        label: const Text('AI Assistant', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
     );
   }
+
 
   Widget _buildDutyMetric({
     required IconData icon,
