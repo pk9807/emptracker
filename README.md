@@ -9,6 +9,16 @@
 
 ---
 
+## 🎬 Live Platform Demo Walkthrough
+
+<div align="center">
+  <img src="docs/assets/emptracker_demo.gif" alt="EmpTracker FieldForce AI Demo Walkthrough" width="380" style="border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid #6366f1;" />
+  <p><em>Live Telemetry, 3D GPS Map Tracking, Geofenced Shop Visits & Multilingual Voice AI Assistant</em></p>
+  <p><a href="docs/assets/emptracker_demo.mp4">▶️ <b>Watch Full HD Demo MP4 Video (60 FPS)</b></a></p>
+</div>
+
+---
+
 ## 📖 Project Overview
 
 **EmpTracker (FieldForce AI)** is an enterprise-grade field employee telemetry, geofenced store auditing, live GPS tracking, and multilingual Voice AI assistant platform. 
